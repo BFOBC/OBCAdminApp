@@ -1,9 +1,9 @@
 import 'package:bf_obc_admin/ui/AdminDashboard.dart';
 import 'package:bf_obc_admin/ui/AdminLogin.dart';
 import 'package:bf_obc_admin/ui/bills/CalculateBill.dart';
-import 'package:bf_obc_admin/ui/user_data/ManageUserScreen.dart';
 import 'package:bf_obc_admin/ui/ReportsPage.dart';
 import 'package:bf_obc_admin/ui/adminprofile.dart';
+import 'package:bf_obc_admin/ui/user_data/ManageUserScreen.dart';
 import 'package:flutter/material.dart';
 
 class SideNavigationBar extends StatefulWidget {
@@ -16,6 +16,8 @@ class SideNavigationBar extends StatefulWidget {
 }
 
 class _SideNavigationBarState extends State<SideNavigationBar> {
+  int _selectedIndex = 0; // Track the selected index
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -56,21 +58,26 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
                     context,
                     Icons.home,
                     "Admin Dashboard",
-                    widget.isActive,
+                    _selectedIndex == 0, // Check if this item is selected
                     () {
+                      setState(() {
+                        _selectedIndex = 0; // Update the selected index
+                      });
                       Navigator.push(
-                        context, 
+                        context,
                         MaterialPageRoute(builder: (context) => AdminDashboard()),
-                     );
+                      );
                     },
                   ),
                   _buildMenuItem(
                     context,
                     Icons.analytics,
                     "Reports",
-                    false,
+                    _selectedIndex == 1, // Check if this item is selected
                     () {
-                      // Navigate to Reports Page
+                      setState(() {
+                        _selectedIndex = 1; // Update the selected index
+                      });
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => ReportsPage()),
@@ -81,9 +88,11 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
                     context,
                     Icons.people,
                     "Manage User",
-                    false,
+                    _selectedIndex == 2, // Check if this item is selected
                     () {
-                      // Navigate to Manage User Page
+                      setState(() {
+                        _selectedIndex = 2; // Update the selected index
+                      });
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => ManageUserScreen()),
@@ -94,9 +103,11 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
                     context,
                     Icons.receipt,
                     "Generate Bill",
-                    false,
+                    _selectedIndex == 3, // Check if this item is selected
                     () {
-                      // Navigate to Generate Bill Page
+                      setState(() {
+                        _selectedIndex = 3; // Update the selected index
+                      });
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => CalculateBill()),
@@ -107,9 +118,11 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
                     context,
                     Icons.person,
                     "Profile",
-                    false,
+                    _selectedIndex == 4, // Check if this item is selected
                     () {
-                      // Navigate to Profile Page
+                      setState(() {
+                        _selectedIndex = 4; // Update the selected index
+                      });
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => AdminProfile()),
@@ -123,44 +136,44 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
 
           // Logout Button
           Expanded(
-  child: Align(
-    alignment: Alignment.bottomCenter,
-    child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF868CFF), Color(0xFF4318FF)],
-          ),
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(context, 
-            MaterialPageRoute(builder: (context) => AdminLoginPage())
-            );
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.transparent, 
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30), // Remove button's border radius
-              side: BorderSide.none, // Remove button's border
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF868CFF), Color(0xFF4318FF)],
+                    ),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AdminLoginPage()),
+                      );
+                    },
+ style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        side: BorderSide.none,
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const SizedBox(
+                      width: double.infinity,
+                      height: 40,
+                      child: Center(
+                        child: Text("Logout", style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
-            elevation: 0,
           ),
-          child: const SizedBox(
-            width: double.infinity,
-            height: 40,
-            child: Center(
-              child: Text("Logout", style: TextStyle(color: Colors.white)),
-            ),
-          ),
-        ),
-      ),
-    ),
-  ),
-),
-
         ],
       ),
     );
@@ -173,10 +186,10 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
       bool isActive,
       VoidCallback onTap) {
     return ListTile(
-      leading: Icon(icon, color: isActive ? Color(0xFF4318FF) : Color(0xFFA3AED0)),
+      leading: Icon(icon, color: isActive ? Color(0xFF2B3674) : Color(0xFFA3AED0)), // Update icon color
       title: Text(
         title,
-        style: TextStyle(color: isActive ? Color(0xFF2B3674) : Color(0xFFA3AED0)),
+        style: TextStyle(color: isActive ? Color(0xFF2B3674) : Color(0xFFA3AED0)), // Update text color
       ),
       onTap: onTap,
     );

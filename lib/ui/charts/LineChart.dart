@@ -1,5 +1,6 @@
-import 'package:charts_flutter_updated/flutter.dart' as charts;
+/*import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+
 class JobsData {
   final String month;
   final int jobCount;
@@ -14,22 +15,47 @@ class LineChartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<charts.Series<JobsData, String>> series = [
-      charts.Series(
-        id: 'Jobs',
-        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        domainFn: (JobsData data, _) => data.month,
-        measureFn: (JobsData data, _) => data.jobCount,
-        data: data,
-      ),
-    ];
-
     return SizedBox(
       height: 200,
-      child: charts.LineChart(
-        series.cast<charts.Series<dynamic, num>>(),
-        animate: true,
+      child: LineChart(
+        LineChartData(
+          gridData: FlGridData(show: true), // Optional: Add grid lines
+          titlesData: FlTitlesData(
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: true),
+            ),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  final index = value.toInt();
+                  if (index >= 0 && index < data.length) {
+                    return Text(
+                      data[index].month,
+                      style: TextStyle(fontSize: 10),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+                interval: 1,
+              ),
+            ),
+          ),
+          borderData: FlBorderData(show: true),
+          lineBarsData: [
+            LineChartBarData(
+              isCurved: true,
+              color: Colors.blue, // Updated to `color` instead of `colors`
+              spots: data.asMap().entries.map((entry) {
+                return FlSpot(entry.key.toDouble(), entry.value.jobCount.toDouble());
+              }).toList(),
+              barWidth: 3,
+              belowBarData: BarAreaData(show: false),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+*/

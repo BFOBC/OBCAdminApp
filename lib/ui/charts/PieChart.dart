@@ -1,5 +1,5 @@
-import 'package:charts_flutter_updated/flutter.dart' as charts;
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
+import 'package:flutter_charts/flutter_charts.dart';  // Import the flutter_charts package
 
 class ActivityData {
   final String type;
@@ -15,30 +15,36 @@ class PieChartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<charts.Series<ActivityData, String>> series = [
-      charts.Series(
-        id: 'Activity',
-        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        domainFn: (ActivityData data, _) => data.type,
-        measureFn: (ActivityData data, _) => data.count,
-        labelAccessorFn: (ActivityData data, _) => '${data.type}: ${data.count}',
-        data: data,
-      ),
-    ];
+    // Preparing the data for the PieChart
+    List<PieChartSegment> segments = data.map((activity) {
+      return PieChartSegment(
+        value: activity.count.toDouble(),
+        label: '${activity.type}: ${activity.count}',
+        color: _getColorForType(activity.type), // Assigning color based on type
+      );
+    }).toList();
 
     return SizedBox(
       height: 200,
-      child: charts.PieChart(
-        series,
+      child: PieChart(
+        segments: segments,
         animate: true,
-        defaultRenderer: charts.ArcRendererConfig(
-          arcRendererDecorators: [
-            charts.ArcLabelDecorator(
-              labelPosition: charts.ArcLabelPosition.auto,
-            ),
-          ],
-        ),
       ),
     );
   }
+
+  // Helper method to assign colors to each type
+  Color _getColorForType(String type) {
+    switch (type) {
+      case 'Type A':
+        return Colors.blue;
+      case 'Type B':
+        return Colors.red;
+      case 'Type C':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
 }
+*/

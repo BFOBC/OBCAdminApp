@@ -1,9 +1,27 @@
 import 'package:bf_obc_admin/ui/CommonLayout.dart';
+import 'package:bf_obc_admin/ui/charts/LineChart.dart';
+import 'package:bf_obc_admin/ui/charts/PieChart.dart';
 import 'package:flutter/material.dart';
 
 class AdminDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // Hardcoded data for the charts
+    /*final pieChartData = [
+      ActivityData('Deliveries', 50),
+      ActivityData('Pickups', 30),
+      ActivityData('Returns', 20),
+    ];
+
+    final lineChartData = [
+      JobsData('Jan', 10),
+      JobsData('Feb', 20),
+      JobsData('Mar', 15),
+      JobsData('Apr', 25),
+      JobsData('May', 30),
+      JobsData('Jun', 28),
+    ];*/
+
     return CommonLayout(
       pageTitle: "Admin Dashboard", // Set the page title
       child: Column(
@@ -25,7 +43,7 @@ class AdminDashboard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Total Jobs Card
+              // Total Jobs Line Chart
               Expanded(
                 flex: 2,
                 child: _buildCard(
@@ -33,24 +51,14 @@ class AdminDashboard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Total Jobs: 200",
+                        "Total Jobs",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 10),
-                      // Placeholder for chart
-                      Container(
-                        height: 150,
-                        color: Colors.grey[200],
-                        child: Center(
-                          child: Text(
-                            "Chart Placeholder",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ),
-                      ),
+                      /*LineChartWidget(data: lineChartData),*/ // Replace placeholder with LineChartWidget
                     ],
                   ),
                 ),
@@ -58,7 +66,7 @@ class AdminDashboard extends StatelessWidget {
 
               const SizedBox(width: 16),
 
-              // Activity Analysis Card
+              // Activity Analysis Pie Chart
               Expanded(
                 child: _buildCard(
                   child: Column(
@@ -72,17 +80,7 @@ class AdminDashboard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      // Placeholder for pie chart
-                      Container(
-                        height: 150,
-                        color: Colors.grey[200],
-                        child: Center(
-                          child: Text(
-                            "Pie Chart Placeholder",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ),
-                      ),
+                      /*PieChartWidget(data: pieChartData),*/ // Replace placeholder with PieChartWidget
                     ],
                   ),
                 ),
