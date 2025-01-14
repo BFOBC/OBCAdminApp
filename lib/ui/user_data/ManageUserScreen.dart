@@ -10,20 +10,17 @@ class ManageUserScreen extends StatelessWidget {
   Future<List<Map<String, dynamic>>> fetchUserData() async {
     try {
       List<Map<String, dynamic>> users = [];
-
       QuerySnapshot courierSnapshot =
           await FirebaseFirestore.instance.collection('courier').get();
 
       for (var doc in courierSnapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
-        // Extract countryName from passports
         final List<dynamic> passports = data['passports'] ?? [];
         String passportCountries = passports
             .map((passport) => passport['countryName'] ?? 'N/A')
             .join(', ');
 
-        // Extract countryName from visas
         final List<dynamic> visas = data['visas'] ?? [];
         String visaCountries =
             visas.map((visa) => visa['countryName'] ?? 'N/A').join(', ');
@@ -35,7 +32,7 @@ class ManageUserScreen extends StatelessWidget {
           'domain': data['domain'] ?? 'N/A',
           'visas': visaCountries,
           'amount': data['amount'] ?? 'N/A',
-          'status': data['status'] ?? false,
+          'status': data['active'] ?? false,
         });
       }
 
@@ -46,21 +43,20 @@ class ManageUserScreen extends StatelessWidget {
     }
   }
 
-  // Function to get the country code from country name
   String getCountryCode(String countryName) {
-    switch (countryName.toLowerCase()) {
-      case 'india':
-        return 'in';
-      case 'usa':
-        return 'us';
-      case 'germany':
-        return 'de';
-      case 'pakistan':
-        return 'pk';
-      // Add other countries as needed
-      default:
-        return 'us'; // Default to 'us' if country name is unknown
+    final Map<String, String> countryCodes = {
+      'pakistan': 'pk',
+      'india': 'in',
+      'usa': 'us',
+      'germany': 'de',
+    };
+
+    String? code = countryCodes[countryName.toLowerCase()];
+    if (code == null) {
+      debugPrint("Warning: Country name '$countryName' not recognized.");
+      return 'unknown';
     }
+    return code;
   }
 
   @override
@@ -73,12 +69,12 @@ class ManageUserScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title Row
+              // Title Row with "Add User" button
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "User  Details",
+                    "User Details",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -108,112 +104,136 @@ class ManageUserScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Table Container
+              // User Data Table with white background
               Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: FutureBuilder<List<Map<String, dynamic>>>(
-                  future: fetchUserData(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return const Center(
-                        child: Text(' Error loading user data.'),
-                      );
-                    } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                      List<Map<String, dynamic>> users = snapshot.data!;
+                color: Colors.white,
+                padding: const EdgeInsets.all(16.0),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: FutureBuilder<List<Map<String, dynamic>>>(
+                    future: fetchUserData(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else if (snapshot.hasError) {
+                        return const Center(
+                          child: Text('Error loading user data.'),
+                        );
+                      } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                        List<Map<String, dynamic>> users = snapshot.data!;
 
-                      return DataTable(
-                        columnSpacing: 16.0,
-                        headingRowColor: WidgetStateColor.resolveWith(
-                            (states) => Colors.grey.shade200),
-                        columns: const [
-                          DataColumn(label: Text('UID')),
-                          DataColumn(label: Text('Name')),
-                          DataColumn(label: Text('Passport Countries')),
-                          DataColumn(label: Text('Domain Name')),
-                          DataColumn(label: Text('Visa Countries')),
-                          DataColumn(label: Text('Amount')),
-                          DataColumn(label: Text('Active Status')),
-                          DataColumn(label: Text('Action')),
-                        ],
-                        rows: users.map((user) {
-                          List<String> passportCountries = user['passports'].split(', ');
-                          List<String> visaCountries = user['visas'].split(', ');
+                        return DataTable(
+                          columnSpacing: 50.0,
+                          headingRowColor: MaterialStateColor.resolveWith(
+                              (states) => const Color.fromARGB(255, 255, 255, 255)),
+                          headingTextStyle: const TextStyle(
+                            color: Color(0xFFA3AED0),
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'DM Sans',
+                            fontSize: 14.0,
+                          ),
+                          dataTextStyle: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          columns: const [
+                            DataColumn(label: Text('UID')),
+                            DataColumn(label: Text('Name')),
+                            DataColumn(label: Text('Passport Countries')),
+                            DataColumn(label: Text('Domain Name')),
+                            DataColumn(label: Text('Visa Countries')),
+                            DataColumn(label: Text('Amount')),
+                            DataColumn(label: Text('Active Status')),
+                            DataColumn(label: Text('Action')),
+                          ],
+                          rows: users.map((user) {
+                            List<String> passportCountries =
+                                user['passports'].split(', ');
+                            List<String> visaCountries =
+                                user['visas'].split(', ');
 
-                          return DataRow(cells: [
-                            DataCell(Text(user['uid'])),
-                            DataCell(Text(user['name'])),
-                            DataCell(Row(
-                              children: passportCountries.map((country) {
-                                String countryCode = getCountryCode(country);
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 8.0),
-                                  child: Image.asset(
-  'assets/images/flags/${countryCode.toLowerCase()}.png',
-  height: 20,
-  width: 20,
-  errorBuilder: (context, error, stackTrace) {
-    return Icon(Icons.flag, color: Colors.grey); // Fallback icon
-  },
-)
-                                );
-                              }).toList(),
-                            )),
-                            DataCell(Text(user['domain'])),
-                            DataCell(Row(
-                              children: visaCountries.map((country) {
-                                String countryCode = getCountryCode(country);
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 8.0),
-                                  child: Image.asset(
-                                    'assets/images/flags/${countryCode.toLowerCase()}.png',
-                                    height: 20,
-                                    width: 20,
-                                  ),
-                                );
-                              }).toList(),
-                            )),
-                            DataCell(Text(user['amount'].toString())),
-                            DataCell(Switch(
-                              value: user['status'],
-                              onChanged: (value) {
-                                // Update status logic
-                              },
-                            )),
-                            DataCell(
-                              Row(
+                            return DataRow(cells: [
+                              DataCell(Text(user['uid'])),
+                              DataCell(Text(user['name'])),
+                              DataCell(Row(
+                                children: passportCountries.map((country) {
+                                  String countryCode =
+                                      getCountryCode(country);
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.only(right: 8.0),
+                                    child: Image.asset(
+                                      'assets/images/flags/${countryCode.toLowerCase()}.png',
+                                      height: 30,
+                                      width: 30,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return const Icon(Icons.flag,
+                                            color: Colors.grey);
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
+                              )),
+                              DataCell(Text(user['domain'])),
+                              DataCell(Row(
+                                children: visaCountries.map((country) {
+                                  String countryCode =
+                                      getCountryCode(country);
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.only(right: 8.0),
+                                    child: Image.asset(
+                                      'assets/images/flags/${countryCode.toLowerCase()}.png',
+                                      height: 30,
+                                      width: 30,
+                                    ),
+                                  );
+                                }).toList(),
+                              )),
+                              DataCell(Text(user['amount'].toString())),
+                              DataCell(
+                                Switch(
+                                  value: user['status'],
+                                  onChanged: (value) {
+                                    // Update status logic
+                                  },
+                                  activeColor: Color(0xFF2B3674), // Active color
+                                  inactiveTrackColor: Color(0xFF707EAE), // Inactive track color
+                                ),
+                              ),
+                              DataCell(Row(
                                 children: [
                                   IconButton(
-                                    icon: const Icon(Icons.edit,
-                                        color: Colors.blue),
+                                    icon: const Icon(Icons.edit_note_outlined,
+                                        color: Colors.blue,
+                                        size: 30),
                                     onPressed: () {
                                       // Edit action logic
                                     },
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.delete,
-                                        color: Colors.red),
+                                    icon: const Icon(Icons.delete_outline,
+                                        color: Colors.red,
+                                        size: 30,),
                                     onPressed: () {
                                       // Delete action logic
                                     },
                                   ),
                                 ],
-                              ),
-                            ),
-                          ]);
-                        }).toList(),
-                      );
-                    } else {
-                      return const Center(child: Text('No users found.'));
-                    }
-                  },
+                              )),
+                            ]);
+                          }).toList(),
+                        );
+                      } else {
+                        return const Center(child: Text('No users found.'));
+                      }
+                    },
+                  ),
                 ),
               ),
-              const SizedBox(height: 16),
             ],
           ),
         ),

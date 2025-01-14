@@ -45,49 +45,19 @@ class AdminDashboard extends StatelessWidget {
             children: [
               // Total Jobs Line Chart
               Expanded(
-                flex: 2,
                 child: _buildCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Total Jobs",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      /*LineChartWidget(data: lineChartData),*/ // Replace placeholder with LineChartWidget
-                    ],
-                  ),
+                  child: LineChartWidget(),
+                ),
+              ),
+              const SizedBox(height: 20),
+            
+                          Expanded(
+                child: _buildCard(
+                  child: PieChartWidget(),
                 ),
               ),
 
               const SizedBox(width: 16),
-
-              // Activity Analysis Pie Chart
-              Expanded(
-                child: _buildCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Activity Analysis",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      /*PieChartWidget(data: pieChartData),*/ // Replace placeholder with PieChartWidget
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
 
           // Recent Payments Section
           _buildCard(
@@ -111,7 +81,9 @@ class AdminDashboard extends StatelessWidget {
           ),
         ],
       ),
-    );
+      ]
+    )
+  );
   }
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color) {
