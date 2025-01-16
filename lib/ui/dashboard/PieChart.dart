@@ -24,8 +24,9 @@ class PieChartWidget extends StatelessWidget {
             Text(
               "Activity Analysis",
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
+                color: Color(0xFF1B2559)
               ),
             ),
             DropdownButton<String>(
@@ -42,22 +43,23 @@ class PieChartWidget extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 16),
         // Pie Chart
-        PieChart(
-          dataMap: dataMap,
-          colorList: colorList,
-          chartType: ChartType.ring,
-          ringStrokeWidth: 0,
-          chartRadius: MediaQuery.of(context).size.width / 2.5,
-          legendOptions: LegendOptions(
-            showLegends: false,
-          ),
-          chartValuesOptions: ChartValuesOptions(
-            showChartValues: false,
+        Expanded(
+          child: PieChart(
+            dataMap: dataMap,
+            colorList: colorList,
+            chartType: ChartType.disc,
+            chartRadius: MediaQuery.of(context).size.width / 6,
+            legendOptions: LegendOptions(
+              showLegends: false,
+            ),
+            chartValuesOptions: ChartValuesOptions(
+              showChartValues: false,
+            ),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 30),
         // Legend
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -79,14 +81,14 @@ class PieChartWidget extends StatelessWidget {
             const SizedBox(width: 5),
             Text(
               title,
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
         ),
-        const SizedBox(height: 5),
+        const SizedBox(height: 0),
         Text(
           percentage,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ),
       ],
     );

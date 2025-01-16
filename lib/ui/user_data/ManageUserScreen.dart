@@ -201,7 +201,7 @@ class ManageUserScreen extends StatelessWidget {
                                     // Update status logic
                                   },
                                   activeColor: Color(0xFF2B3674), // Active color
-                                  inactiveTrackColor: Color(0xFF707EAE), // Inactive track color
+                                  inactiveTrackColor: Color.fromARGB(255, 248, 249, 255), // Inactive track color
                                 ),
                               ),
                               DataCell(Row(
