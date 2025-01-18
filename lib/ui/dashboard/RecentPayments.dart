@@ -1,56 +1,106 @@
+import 'package:bf_obc_admin/ui/SeeAllRecentPayments.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+class RecentPaymentsData {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  // Stream to get recent payments
+  Stream<List<Map<String, dynamic>>> getRecentPayments(int limit) {
+    return _firestore
+        .collection('payments')
+        .orderBy('timestamp', descending: true)
+        .limit(limit)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              return {
+                'name': data['name'] ?? 'Unknown',
+                'amount': data['amount'] ?? 'Unknown',
+                'avatar': data['avatar'],
+                'timestamp': (data['timestamp'] as Timestamp?)?.toDate(),
+              };
+            }).toList());
+  }
+}
+
 class RecentPaymentsWidget extends StatelessWidget {
+  final RecentPaymentsData _recentPaymentsData = RecentPaymentsData();
+
   @override
   Widget build(BuildContext context) {
     return _buildCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Recent Payments",
-            style: TextStyle(
-              color: Color(0xFF1B2559),
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+          // Title and "See All" Button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Recent Payments",
+                style: TextStyle(
+                  color: Color(0xFF1B2559),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SeeAllRecentPayments(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFF4F7FE),
+                  foregroundColor: const Color(0xFF4318FF),
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32),
+                  ),
+                ),
+                child: const Text(
+                  "See All",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'DM Sans',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 10),
-          StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('payments')
-                .orderBy('timestamp', descending: true)
-                .limit(5)
-                .snapshots(),
+          StreamBuilder<List<Map<String, dynamic>>>(
+            stream: _recentPaymentsData.getRecentPayments(5),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
+                return const Center(child: CircularProgressIndicator());
               }
 
               if (snapshot.hasError) {
-                return Center(
-                  child: Text('Error: ${snapshot.error}'),
-                );
+                return Center(child: Text('Error: ${snapshot.error}'));
               }
 
-              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return Text("No recent payments found.");
-              }
+              final payments = snapshot.data ?? [];
 
-              final payments = snapshot.data!.docs;
+              if (payments.isEmpty) {
+                return const Text("No recent payments found.");
+              }
+              final limitedPayments = payments.take(5).toList();
+              
               return Column(
                 children: payments.map((payment) {
-                  final data = payment.data() as Map<String, dynamic>;
-                  final name = data['name'] ?? 'Unknown';
-                  final amount = data['amount'] ?? 'Unknown';
-                  final avatarUrl = data['avatar'] ?? null;
-                  final timestamp = data['timestamp'] as Timestamp?;
-                  final time = timestamp != null ? _formatTimestamp(timestamp.toDate()) : "Unknown time";
-
-                  return _buildRecentPaymentItem(name, avatarUrl, "Rs. $amount", time);
+                  return _buildRecentPaymentItem(
+                    payment['name'] ?? 'Unknown',
+                    payment['avatar'] as String?,
+                    "Rs. ${payment['amount']}",
+                    _formatTimestamp(payment['timestamp'] as DateTime?),
+                  );
                 }).toList(),
               );
             },
@@ -69,14 +119,14 @@ class RecentPaymentsWidget extends StatelessWidget {
           Row(
             children: [
               CircleAvatar(
-              radius: 20,
-              backgroundColor: Colors.blueAccent.withOpacity(0.2),
-              backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
-              ? NetworkImage(avatarUrl)
-              : null, // Fallback to null if avatarUrl is empty
-              child: avatarUrl == null || avatarUrl.isEmpty
-              ? Icon(Icons.person, color: Colors.blueAccent)
-              : null, // Display icon only if no avatar URL
+                radius: 20,
+                backgroundColor: Colors.blueAccent.withOpacity(0.2),
+                backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
+                    ? NetworkImage(avatarUrl)
+                    : null,
+                child: avatarUrl == null || avatarUrl.isEmpty
+                    ? const Icon(Icons.person, color: Colors.blueAccent)
+                    : null,
               ),
               const SizedBox(width: 10),
               Text(name),
@@ -84,9 +134,9 @@ class RecentPaymentsWidget extends StatelessWidget {
           ),
           Row(
             children: [
-              Text(amount, style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(amount, style: const TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(width: 75),
-              Text(time, style: TextStyle(color: Colors.grey)),
+              Text(time, style: const TextStyle(color: Colors.grey)),
             ],
           ),
         ],

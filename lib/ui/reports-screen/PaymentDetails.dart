@@ -2,7 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart'; // Import the intl package
 
+class PaymentRepository {
+  final FirebaseFirestore _firestore;
+
+  PaymentRepository({FirebaseFirestore? firestore})
+      : _firestore = firestore ?? FirebaseFirestore.instance;
+
+  Stream<List<Map<String, dynamic>>> getPaymentsStream() {
+    return _firestore.collection('payments').snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+    });
+  }
+}
+
 class PaymentDetails extends StatelessWidget {
+  final PaymentRepository paymentRepository;
+
+  PaymentDetails({Key? key, required this.paymentRepository}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -23,20 +40,20 @@ class PaymentDetails extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('payments').snapshots(),
+            StreamBuilder<List<Map<String, dynamic>>>(
+              stream: paymentRepository.getPaymentsStream(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(
                     child: Text("No payment data available."),
                   );
                 }
 
-                final payments = snapshot.data!.docs;
+                final payments = snapshot.data!;
 
                 return Table(
                   columnWidths: const {
@@ -73,14 +90,13 @@ class PaymentDetails extends StatelessWidget {
     );
   }
 
-  List<TableRow> _buildTableRows(List<QueryDocumentSnapshot> payments) {
-    return payments.map((payment) {
-      final data = payment.data() as Map<String, dynamic>;
-            final name = data['name'] ?? "N/A";
+  List<TableRow> _buildTableRows(List<Map<String, dynamic>> payments) {
+    return payments.map((data) {
+      final name = data['name'] ?? "N/A";
       final address = data['address'] ?? "N/A";
       final amount = data['amount'] ?? "N/A";
       final timestamp = (data['timestamp'] as Timestamp?)?.toDate();
-      
+
       // Format the date using the intl package
       String date = "N/A";
       if (timestamp != null) {

@@ -24,27 +24,30 @@ class ReportsPage extends StatelessWidget {
           const SizedBox(height: 20),
 
           // Payment Details Section
-          PaymentDetails(), // Use the PaymentDetails widget
+          PaymentDetails(paymentRepository: PaymentRepository()), // Use the PaymentDetails widget
 
           const SizedBox(height: 20),
 
-          // Row for Weekly Payments and Pending Payments
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Weekly Payments Section
-              Expanded(
-                flex: 1,
-                child: StackedChart(), // Use the StackedChart widget
-              ),
-              const SizedBox(width: 16), // Space between the two columns
+          // Container for Weekly Payments and Pending Payments
+          Container(
+            height: 400, // Specify the height of the container
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Weekly Payments Section
+                Expanded(
+                  flex: 1,
+                  child: StackedChart(), // Use the StackedChart widget
+                ),
+                const SizedBox(width: 16), // Space between the two columns
 
-              // Pending Payments Section
-              Expanded(
-                flex: 1,
-                child: PendingPayments(), // Use the PendingPayments widget
-              ),
-            ],
+                // Pending Payments Section
+                Expanded(
+                  flex: 1,
+                  child: PendingPayments(), // Use the PendingPayments widget
+                ),
+              ],
+            ),
           ),
         ],
       ),

@@ -37,8 +37,15 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AdminProfile()),
+              );
+            },
           // Profile Section
-          Container(
+          child: Container(
             padding: const EdgeInsets.symmetric(vertical: 20),
             child: Column(
               children: [
@@ -56,6 +63,7 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
                 ),
               ],
             ),
+           ),
           ),
 
           // Navigation Menu

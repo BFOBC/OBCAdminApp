@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 class LineChartWidget extends StatelessWidget {
   final List<LineChartModel> data = [
     LineChartModel(date: DateTime(2024, 9), amount: 50),
@@ -9,7 +8,6 @@ class LineChartWidget extends StatelessWidget {
     LineChartModel(date: DateTime(2025, 1), amount: 130),
     LineChartModel(date: DateTime(2025, 2), amount: 200),
   ];
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -64,11 +62,9 @@ class LineChartWidget extends StatelessWidget {
     );
   }
 }
-
 // Placeholder Model
 class LineChartModel {
   final DateTime date;
   final double amount;
-
   LineChartModel({required this.date, required this.amount});
 }
